@@ -1,11 +1,13 @@
 
-function VisualShape(shape, color)
+class VisualShape
 {
-	this.shape = shape;
-	this.color = color;
-}
-{
-	VisualShape.prototype.draw = function(display, pos)
+	constructor(shape, color)
+	{
+		this.shape = shape;
+		this.color = color;
+	}
+
+	draw(display, pos)
 	{
 		this.shape.draw(display, pos, this.color);
 	}

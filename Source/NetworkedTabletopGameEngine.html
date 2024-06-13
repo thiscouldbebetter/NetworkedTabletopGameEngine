@@ -3,7 +3,6 @@
 
 <!-- imports -->
 
-<script type="text/javascript" src="Common/ArrayExtensions.js"></script>
 <script type="text/javascript" src="Common/Action.js"></script>
 <script type="text/javascript" src="Common/Activity.js"></script>
 <script type="text/javascript" src="Common/Body.js"></script>
@@ -65,7 +64,7 @@ function Local()
 		this.world.updatesOutgoing.push(update);
 		*/
 
-		var bodyDefnPlayer = this.world.bodyDefns["Player"];
+		var bodyDefnPlayer = this.world.bodyDefnByName("Player");
 
 		var bodyForUser = new Body
 		(

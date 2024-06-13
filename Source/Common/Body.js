@@ -1,49 +1,52 @@
 
-function Body(id, name, defnName, pos)
+class Body
 {
-	this.id = id;
-	this.name = name;
-	this.defnName = defnName;
-	this.pos = pos;
+	constructor(id, name, defnName, pos)
+	{
+		this.id = id;
+		this.name = name;
+		this.defnName = defnName;
+		this.pos = pos;
 
-	this.bodyHeld = null;
-}
+		this.bodyHeld = null;
+	}
 
-{
 	// instance methods
 
-	Body.prototype.defn = function(world)
+	defn(world)
 	{
-		var returnValue = world.bodyDefns[this.defnName];
+		var returnValue = world.bodyDefnByName(this.defnName);
 		return returnValue;
 	};
 
-	Body.prototype.initializeForWorld = function(world)
+	initializeForWorld(world)
 	{
 		var bodyDefn = this.defn(world);
 		this.activity = bodyDefn.activity;
 	};
 
-	Body.prototype.overwriteWith = function(other)
+	overwriteWith(other)
 	{
 		this.defnName = other.defnName;
 		this.pos.overwriteWith(other.pos);
 	};
 
-	Body.prototype.updateForTick_Actions = function(universe, world)
+	updateForTick_Actions(universe, world)
 	{
 		if (this.activity != null)
 		{
 			var bodyDefn = this.defn(world);
 
-			this.activity.perform(world, null, this, this.activity);
+			var inputHelper = universe.inputHelper;
+
+			this.activity.perform(world, inputHelper, this, this.activity);
 
 			var actionNames = this.activity.actionNames;
 
 			for (var a = 0; a < actionNames.length; a++)
 			{
 				var actionName = actionNames[a];
-				var action = world.actions[actionName];
+				var action = world.actionByName(actionName);
 				action.perform(universe, world, this);
 			}
 			
@@ -51,7 +54,7 @@ function Body(id, name, defnName, pos)
 		}
 	};
 
-	Body.prototype.updateForTick_Connectivity = function()
+	updateForTick_Connectivity()
 	{
 		if (this.isDisconnected)
 		{
@@ -70,7 +73,7 @@ function Body(id, name, defnName, pos)
 
 	// drawable
 
-	Body.prototype.drawToDisplay = function(display, world)
+	drawToDisplay(display, world)
 	{
 		var body = this;
 

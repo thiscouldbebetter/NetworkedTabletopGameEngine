@@ -1,13 +1,12 @@
 
 
-function Log()
-{}
+class Log
 {
-	Log.IsEnabled = false;
+	static IsEnabled = false;
 
-	Log.write = function(message)
+	static write(message)
 	{
-		if (Log.IsEnabled == true)
+		if (Log.IsEnabled)
 		{
 			console.log(message);
 		}

@@ -1,17 +1,18 @@
 
-function Display(divID, size)
+class Display
 {
-	this.divID = divID;
-	this.size = size;
+	constructor(divID, size)
+	{
+		this.divID = divID;
+		this.size = size;
 
-	this.colorBack = "White";
-	this.colorFore = "Gray";
+		this.colorBack = "White";
+		this.colorFore = "Gray";
 
-	this._drawPos = new Coords();
-}
+		this._drawPos = new Coords();
+	}
 
-{
-	Display.prototype.clear = function()
+	clear()
 	{
 		var g = this.graphics;
 		g.fillStyle = this.colorBack;
@@ -19,22 +20,22 @@ function Display(divID, size)
 
 		g.strokeStyle = this.colorFore;
 		g.strokeRect(0, 0, this.size.x, this.size.y);
-	};
+	}
 
-	Display.prototype.drawCircle = function(center, radius, color)
+	drawCircle(center, radius, color)
 	{
 		var g = this.graphics;
-		
+
 		g.beginPath();
 		g.arc(center.x, center.y, radius, 0, Math.PI * 2);
-		
+
 		g.fillStyle = "White";
 		g.fill();
 		g.strokeStyle = color;
 		g.stroke();
 	}
 
-	Display.prototype.drawRay = function(vertex, orientation, length, color)
+	drawRay(vertex, orientation, length, color)
 	{
 		var g = this.graphics;
 		g.strokeStyle = color;
@@ -56,13 +57,13 @@ function Display(divID, size)
 		g.stroke();
 	}
 
-	Display.prototype.drawRectangle = function(pos, size, color)
+	drawRectangle(pos, size, color)
 	{
 		var g = this.graphics;
-		
+
 		var drawPos =
 			this._drawPos.overwriteWith(size).half().invert().add(pos);
-		
+
 		g.fillStyle = "White";
 		g.fillRect(drawPos.x, drawPos.y, size.x, size.y);
 
@@ -70,7 +71,7 @@ function Display(divID, size)
 		g.strokeRect(drawPos.x, drawPos.y, size.x, size.y);
 	}
 
-	Display.prototype.drawText = function(text, drawPos)
+	drawText(text, drawPos)
 	{
 		var g = this.graphics;
 		g.fillStyle = this.colorFore;
@@ -80,9 +81,9 @@ function Display(divID, size)
 			drawPos.x - g.measureText(text).width / 2,
 			drawPos.y
 		);
-	};
+	}
 
-	Display.prototype.initialize = function(document)
+	initialize(document)
 	{
 		var canvas = document.createElement("canvas");
 		canvas.width = this.size.x;
@@ -96,5 +97,5 @@ function Display(divID, size)
 		divDisplay.appendChild(canvas);
 
 		this.domElement = canvas;
-	};
+	}
 }

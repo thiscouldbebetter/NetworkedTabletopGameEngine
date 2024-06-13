@@ -1,11 +1,7 @@
 
-function Serializer()
+class Serializer
 {
-	// do nothing
-}
-
-{
-	Serializer.prototype.deserialize = function(stringToDeserialize)
+	deserialize(stringToDeserialize)
 	{
 		var nodeRoot = JSON.parse(stringToDeserialize);
 		nodeRoot.__proto__ = SerializerNode.prototype;
@@ -15,7 +11,7 @@ function Serializer()
 		return returnValue;
 	};
 
-	Serializer.prototype.serialize = function(objectToSerialize)
+	serialize(objectToSerialize)
 	{
 		var nodeRoot = new SerializerNode(objectToSerialize);
 

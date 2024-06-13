@@ -1,16 +1,17 @@
 
-function Update_BodyCreate(body)
+class Update_BodyCreate
 {
-	this.body = body;
-}
-
-{
-	Update_BodyCreate.prototype.updateWorld = function(world)
+	constructor(body)
 	{
-		var bodyExisting = world.bodies[this.body.id];
+		this.body = body;
+	}
+
+	updateWorld(world)
+	{
+		var bodyExisting = world.bodyById(this.body.id);
 		if (bodyExisting == null)
 		{
 			world.bodiesToSpawn.push(this.body);
 		}
-	};
+	}
 }

@@ -1,30 +1,31 @@
 
-function Update_Actions(bodyID, actionNames)
+class Update_Actions
 {
-	this.bodyID = bodyID;
-	this.actionNames = actionNames;
-}
-
-{
-	// methods
-	
-	Update_Actions.prototype.updateWorld = function(world)
+	constructor(bodyID, actionNames)
 	{
-		var body = world.bodies[this.bodyID];
+		this.bodyID = bodyID;
+		this.actionNames = actionNames;
+	}
+
+	// methods
+
+	updateWorld(world)
+	{
+		var body = world.bodyById(this.bodyID);
 
 		if (body != null)
 		{
 			body.ticksSinceActionPerformed = 0;
 			body.activity.actionNames.length = 0;
-			body.activity.actionNames.append(this.actionNames);
+			body.activity.actionNames.push(...this.actionNames);
 		}
 	};
-	
+
 	// serialization
-	
-	Update_Actions.UpdateCode = "A";
-	
-	Update_Actions.prototype.deserialize = function(updateSerialized)
+
+	static UpdateCode = "A";
+
+	deserialize(updateSerialized)
 	{
 		var parts = updateSerialized.split(";");
 		
@@ -35,9 +36,9 @@ function Update_Actions(bodyID, actionNames)
 		);
 		
 		return returnValue
-	};
-	
-	Update_Actions.prototype.serialize = function()
+	}
+
+	serialize()
 	{
 		var returnValue = 
 			Update_Actions.UpdateCode + ";"
@@ -45,5 +46,5 @@ function Update_Actions(bodyID, actionNames)
 			+ this.actionNames.join(";");
 			
 		return returnValue;
-	};
+	}
 }

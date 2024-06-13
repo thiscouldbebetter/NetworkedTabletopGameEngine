@@ -1,13 +1,9 @@
 
-function IDHelper()
+class IDHelper
 {
-	// static class
-}
+	static _idNext = 0;
 
-{
-	IDHelper._idNext = 0;
-
-	IDHelper.IDNext = function()
+	static IDNext()
 	{
 		return "_" + IDHelper._idNext++;
 	};

@@ -1,24 +1,30 @@
 
-function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
+class World
 {
-	this.name = name;
-	this.ticksPerSecond = ticksPerSecond;
-	this.size = size;
-	this.actions = actions.addLookups("name").addLookups("inputName");
-	this.bodyDefns = bodyDefns.addLookups("name");
+	constructor(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
+	{
+		this.name = name;
+		this.ticksPerSecond = ticksPerSecond;
+		this.size = size;
+		this.actions = actions;
+		this.actionsByName = new Map(actions.map(x => [x.name, x] ) );
+		this.actionsByInputName = new Map(actions.map(x => [x.inputName, x] ) );
+		this.bodyDefns = bodyDefns;
+		this.bodyDefnsByName = new Map(this.bodyDefns.map(x => [x.name, x] ) );
 
-	this.bodies = [];
+		this.bodies = [];
+		this.bodiesById = new Map();
 
-	this.bodiesToSpawn = bodiesInitial.slice();
-	this.bodyIDsToRemove = [];
+		this.bodiesToSpawn = bodiesInitial.slice();
+		this.bodyIDsToRemove = [];
 
-	this.updatesImmediate = [];
-	this.updatesOutgoing = [];
-}
-{
+		this.updatesImmediate = [];
+		this.updatesOutgoing = [];
+	}
+
 	// static methods
 
-	World.build = function(arenaSize, movableDimension, playerSize, numberOfPlayers)
+	static build(arenaSize, movableDimension, playerSize, numberOfPlayers)
 	{
 		var actions = 
 		[
@@ -27,7 +33,7 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 				"Activate",
 				"MouseDown", // "Enter", // inputName
 				// peform
-				function(universe, world, body)
+				(universe, world, body) =>
 				{
 					universe.inputHelper.inputRemove("MouseDown");
 
@@ -63,7 +69,7 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 				"MoveDown",
 				"ArrowDown", // inputName
 				// perform
-				function(universe, world, body)
+				(universe, world, body) =>
 				{
 					body.pos.y += 1;
 				}
@@ -74,7 +80,7 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 				"MoveLeft",
 				"ArrowLeft", // inputName
 				// perform
-				function(universe, world, body)
+				(universe, world, body) =>
 				{
 					body.pos.x -= 1;
 				}
@@ -85,7 +91,7 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 				"MoveRight",
 				"ArrowRight", // inputName
 				// perform
-				function(universe, world, body)
+				(universe, world, body) =>
 				{
 					body.pos.x += 1;
 				}
@@ -96,7 +102,7 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 				"MoveToMouseCursor",
 				"MouseMove", // inputName
 				// perform
-				function(universe, world, body)
+				(universe, world, body) =>
 				{
 					var mousePos = universe.inputHelper.mousePos;
 					body.pos.overwriteWith(mousePos);
@@ -108,24 +114,24 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 				"MoveUp",
 				"ArrowUp", // inputName
 				// perform
-				function(universe, world, body)
+				(universe, world, body) =>
 				{
 					body.pos.y -= 1;
 				}
 			),
-						
+
 			new Action
 			(
 				"Quit",
 				"Escape", // inputName
-				function(universe, world, body)
+				(universe, world, body) =>
 				{
 					// todo
 				}
 			),
 		];
 
-		var actionNames = actions.members("name");
+		var actionNames = actions.map(x => x.name);
 
 		var bodyDefnMovable = BodyDefn.movable(movableDimension);
 
@@ -204,8 +210,8 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 
 		return returnValue;
 	};
-	
-	World.default = function()
+
+	static default()
 	{
 		return World.build
 		(
@@ -218,17 +224,40 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 
 	// instance methods
 
-	World.prototype.bodyRemove = function(body)
+	actionByInputName(inputName)
+	{
+		return this.actionsByInputName.get(inputName);
+	}
+
+	actionByName(name)
+	{
+		return this.actionsByName.get(name);
+	}
+
+	bodyById(id)
+	{
+		return this.bodiesById.get(id);
+	}
+
+	bodyDefnByName(name)
+	{
+		return this.bodyDefnsByName.get(name);
+	}
+
+	bodyRemove(body)
 	{
 		if (body != null)
 		{
-			this.bodies.remove(body);
-			this.bodies[body.id] = null;
-			delete this.bodies[body.id];
+			var bodyIndex = this.bodies.indexOf(body);
+			if (bodyIndex >= 0)
+			{
+				this.bodies.splice(bodyIndex, 1);
+				this.bodiesById.delete(body.id);
+			}
 		}
 	};
 
-	World.prototype.bodySpawn = function(body, spawnUnder)
+	bodySpawn(body, spawnUnder)
 	{
 		if (spawnUnder)
 		{
@@ -238,16 +267,16 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 		{
 			this.bodies.push(body);
 		}
-		this.bodies[body.id] = body;
+		this.bodiesById.set(body.id, body);
 		body.initializeForWorld(this);
 	};
 
-	World.prototype.millisecondsPerTick = function()
+	millisecondsPerTick()
 	{
 		return Math.floor(1000 / this.ticksPerSecond);
 	};
 
-	World.prototype.movablesAtPosAddToList = function(posToCheck, movablesAtPos)
+	movablesAtPosAddToList(posToCheck, movablesAtPos)
 	{
 		var bodies = this.bodies;
 		for (var i = bodies.length - 1; i >= 0; i--)
@@ -265,8 +294,8 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 
 		return movablesAtPos;
 	}
-	
-	World.prototype.overwriteWith = function(other)
+
+	overwriteWith(other)
 	{
 		this.name = other.name;
 		this.ticksPerSecond = other.ticksPerSecond;
@@ -275,8 +304,8 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 		this.bodyDefns = other.bodyDefns;
 		this.bodies = other.bodies;
 	};
-		
-	World.prototype.updateForTick_Remove = function()
+
+	updateForTick_Remove()
 	{
 		// hack
 		// If a client is paused, the updates build up,
@@ -303,7 +332,7 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 		this.bodyIDsToRemove = bodyIDsThatCannotYetBeRemoved;
 	};
 
-	World.prototype.updateForTick_Spawn = function()
+	updateForTick_Spawn()
 	{
 		for (var i = 0; i < this.bodiesToSpawn.length; i++)
 		{
@@ -312,8 +341,8 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 		}
 		this.bodiesToSpawn.length = 0;
 	};
-	
-	World.prototype.updateForTick_UpdatesApply = function(updatesToApply)
+
+	updateForTick_UpdatesApply(updatesToApply)
 	{
 		for (var i = 0; i < updatesToApply.length; i++)
 		{
@@ -325,7 +354,7 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 
 	// drawable
 
-	World.prototype.drawToDisplay = function(display)
+	drawToDisplay(display)
 	{
 		display.clear();
 
@@ -334,6 +363,6 @@ function World(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
 		{
 			var body = bodies[i];
 			body.drawToDisplay(display, this);
-		}		
+		}
 	};
 }

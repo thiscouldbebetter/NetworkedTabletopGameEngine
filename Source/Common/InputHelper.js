@@ -1,50 +1,58 @@
 
-function InputHelper()
+class InputHelper
 {
-	this.mousePos = new Coords();
-}
+	constructor()
+	{
+		this.mousePos = new Coords();
+	}
 
-{
-	InputHelper.prototype.initialize = function(document, display)
+	initialize(document, display)
 	{
 		this.inputNamesActive = [];
-		var body = document.body;
+		this.inputNamesActiveByInputName = new Map();
+
+		var d = document;
+		var body = d.body;
 		body.onkeydown = this.handleEventKeyDown.bind(this);
 		body.onkeyup = this.handleEventKeyUp.bind(this);
-		
+
 		var canvas = display.canvas;
 		canvas.onmousedown = this.handleEventMouseDown.bind(this);
 		canvas.onmousemove = this.handleEventMouseMove.bind(this);
 	};
 
-	InputHelper.prototype.inputAdd = function(inputName)
+	inputAdd(inputName)
 	{
-		if (this.inputNamesActive[inputName] == null)
+		if (this.inputNamesActiveByInputName.has(inputName) == false)
 		{
 			this.inputNamesActive.push(inputName);
-			this.inputNamesActive[inputName] = inputName;
+			this.inputNamesActiveByInputName.set(inputName, inputName);
 		}
 	}
 
-	InputHelper.prototype.inputRemove = function(inputName)
+	inputRemove(inputName)
 	{
-		this.inputNamesActive.remove(inputName);
-		delete this.inputNamesActive[inputName];
+		var inputNameIndex = this.inputNamesActive.indexOf(inputName);
+		if (inputNameIndex >= 0)
+		{
+			this.inputNamesActive.splice(inputNameIndex, 1);
+			this.inputNamesActiveByInputName.delete(inputName);
+		}
 	}
 
 	// events
 
-	InputHelper.prototype.handleEventKeyDown = function(event)
+	handleEventKeyDown(event)
 	{
 		this.inputAdd(event.key);
 	};
 
-	InputHelper.prototype.handleEventKeyUp = function(event)
+	handleEventKeyUp(event)
 	{
 		this.inputRemove(event.key);
 	};
 
-	InputHelper.prototype.handleEventMouseDown = function(event)
+	handleEventMouseDown(event)
 	{
 		var canvasClientRect = event.target.getClientRects()[0];
 		this.mousePos.overwriteWithXY
@@ -55,7 +63,7 @@ function InputHelper()
 		this.inputAdd("MouseDown");
 	}
 
-	InputHelper.prototype.handleEventMouseMove = function(event)
+	handleEventMouseMove(event)
 	{
 		var canvasClientRect = event.target.getClientRects()[0];
 		this.mousePos.overwriteWithXY

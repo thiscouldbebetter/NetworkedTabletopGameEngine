@@ -1,11 +1,13 @@
 
-function VisualText(text, color)
+class VisualText
 {
-	this.text = text;
-	this.color = color;
-}
-{
-	VisualText.prototype.draw = function(display, pos)
+	constructor(text, color)
+	{
+		this.text = text;
+		this.color = color;
+	}
+
+	draw(display, pos)
 	{
 		display.drawText(this.text, pos, this.color);
 	}

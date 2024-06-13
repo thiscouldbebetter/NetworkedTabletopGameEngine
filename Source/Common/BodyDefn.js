@@ -1,26 +1,27 @@
 
-function BodyDefn
-(
-	name, 
-	categoryNames,
-	color, 
-	collider,
-	visual,
-	activity,
-	actionNames
-)
+class BodyDefn
 {
-	this.name = name;
-	this.categoryNames = categoryNames;
-	this.color = color;
-	this.collider = collider;
-	this.visual = visual;
-	this.activity = activity;
-	this.actionNames = actionNames;
-}
+	constructor
+	(
+		name, 
+		categoryNames,
+		color, 
+		collider,
+		visual,
+		activity,
+		actionNames
+	)
+	{
+		this.name = name;
+		this.categoryNames = categoryNames;
+		this.color = color;
+		this.collider = collider;
+		this.visual = visual;
+		this.activity = activity;
+		this.actionNames = actionNames;
+	}
 
-{
-	BodyDefn.movable = function(dimension)
+	static movable(dimension)
 	{
 		var color = ColorHelper.random();
 
@@ -47,7 +48,7 @@ function BodyDefn
 		return returnValue;
 	};
 
-	BodyDefn.player = function(name, dimension)
+	static player(name, dimension)
 	{
 		var color = ColorHelper.random();
 
@@ -55,27 +56,27 @@ function BodyDefn
 		(
 			"UserInputAccept",
 			// perform
-			function(world, inputHelper, actor, activity)
+			(world, inputHelper, actor, activity) =>
 			{
 				if (inputHelper == null)
 				{
 					return;
 				}
-				
+
 				var activityActionNames = activity.actionNames;
 				activityActionNames.length = 0;
-		
+
 				var bodyDefn = actor.defn(world);
 
 				var inputNamesActive = inputHelper.inputNamesActive;
 				for (var i = 0; i < inputNamesActive.length; i++)
 				{
 					var inputNameActive = inputNamesActive[i];
-					var action = world.actions[inputNameActive];
+					var action = world.actionByInputName(inputNameActive);
 					if (action != null)
 					{
 						var actionName = action.name;
-						if (bodyDefn.actionNames.contains(actionName))
+						if (bodyDefn.actionNamesContains(actionName))
 						{
 							activityActionNames.push(actionName);
 						}
@@ -118,7 +119,7 @@ function BodyDefn
 		return returnValue;
 	};
 
-	BodyDefn.playerScreen = function(dimension)
+	static playerScreen(dimension)
 	{
 		var color = "Gray";
 
@@ -130,7 +131,7 @@ function BodyDefn
 			new VisualShape(shape, visualColor),
 			new VisualText("PlayerScreen", visualColor)
 		]);
-		
+
 		var returnValue = new BodyDefn
 		(
 			"PlayerScreen",
@@ -144,10 +145,15 @@ function BodyDefn
 
 		return returnValue;
 	};
-	
+
 	// instance methods
-	
-	BodyDefn.prototype.clone = function()
+
+	actionNamesContains(name)
+	{
+		return (this.actionNames.indexOf(name) >= 0);
+	}
+
+	clone()
 	{
 		return new BodyDefn
 		(
