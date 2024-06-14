@@ -1,14 +1,22 @@
 
 class VisualText
 {
-	constructor(text, color)
+	constructor(text, heightInPixels, colorFill, colorBorder)
 	{
 		this.text = text;
-		this.color = color;
+		this.heightInPixels = heightInPixels;
+		this.colorFill = colorFill;
+		this.colorBorder = colorBorder;
 	}
 
 	draw(display, pos)
 	{
-		display.drawText(this.text, pos, this.color);
+		display.drawText
+		(
+			this.text,
+			this.heightInPixels,
+			this.colorFill, this.colorBorder,
+			pos
+		);
 	}
 }

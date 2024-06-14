@@ -8,6 +8,11 @@ class ShapeRectangle
 		this._posRelative = new Coords();
 	}
 
+	static fromSize(size)
+	{
+		return new ShapeRectangle(size);
+	}
+
 	containsPointForPos(pointToCheck, shapePos)
 	{
 		var posRelative =
@@ -24,6 +29,6 @@ class ShapeRectangle
 
 	draw(display, pos, color)
 	{
-		display.drawRectangle(pos, this.size, color);
+		display.drawRectangle(pos, this.size, color, null);
 	}
 }

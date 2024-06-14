@@ -11,6 +11,21 @@ class Coords
 
 	static NumberOfDimensions = 2;
 
+	static create()
+	{
+		return new Coords();
+	}
+
+	static fromXY(x, y)
+	{
+		return new Coords(x, y);
+	}
+
+	static zeroes()
+	{
+		return new Coords(0, 0);
+	}
+
 	// instance methods
 
 	add(other)

@@ -1,10 +1,20 @@
 
 class World
 {
-	constructor(name, ticksPerSecond, size, actions, bodyDefns, bodiesInitial)
+	constructor
+	(
+		name,
+		ticksPerSecond,
+		colorBackground,
+		size,
+		actions,
+		bodyDefns,
+		bodiesInitial
+	)
 	{
 		this.name = name;
 		this.ticksPerSecond = ticksPerSecond;
+		this.colorBackground = colorBackground;
 		this.size = size;
 		this.actions = actions;
 		this.actionsByName = new Map(actions.map(x => [x.name, x] ) );
@@ -133,54 +143,125 @@ class World
 
 		var actionNames = actions.map(x => x.name);
 
-		var bodyDefnMovable = BodyDefn.movable(movableDimension);
+		var bodyDefns = [];
 
-		var worldSize = new Coords(1, 1).multiplyScalar(arenaSize);
-		
-		var bodies = [];
+		var colorWhite = "White";
+		var colorBlack = "Black";
+		var colors = [ colorWhite, colorBlack ];
 
-		var numberOfMovables = 8;
-		var marginSize = bodyDefnMovable.collider.size;
-		var orientationDefault = new Coords(1, 0); // todo
-		var worldSizeMinusMargins =
-			worldSize.clone().subtract(marginSize).subtract(marginSize);
-		for (var i = 0; i < numberOfMovables; i++)
+		var scaleFactor = 20;
+		var rectangleMedium =
+			ShapeRectangle.fromSize(Coords.fromXY(1, 2).multiplyScalar(scaleFactor) );
+		var rectangleShort =
+			ShapeRectangle.fromSize(Coords.fromXY(1, 1).multiplyScalar(scaleFactor) );
+		var rectangleTall =
+			ShapeRectangle.fromSize(Coords.fromXY(1, 3).multiplyScalar(scaleFactor) );
+
+		var pieceNamesShapesAndCounts =
+		[
+			[ "Bishop", rectangleMedium, 2 ],
+			[ "King", rectangleTall, 1 ],
+			[ "Knight", rectangleMedium, 2 ],
+			[ "Pawn", rectangleShort, 8 ],
+			[ "Queen", rectangleTall, 1 ],
+			[ "Rook", rectangleMedium, 2 ],
+		];
+
+		for (var c = 0; c < colors.length; c++)
 		{
-			var movablePos =
-				new Coords().randomize().multiply
+			var color = colors[c];
+			var colorOther = colors[1 - c];
+
+			for (var p = 0; p < pieceNamesShapesAndCounts.length; p++)
+			{
+				var pieceNameShapeAndCount = pieceNamesShapesAndCounts[p];
+				var pieceName = pieceNameShapeAndCount[0];
+				var pieceShape = pieceNameShapeAndCount[1];
+
+				var bodyDefn = BodyDefn.movable
 				(
-					worldSizeMinusMargins
-				).add
-				(
-					marginSize
+					color + " " + pieceName, // name
+					color,
+					colorOther,
+					pieceShape
 				);
 
-			var bodyMovable = new Body
-			(
-				"Movable" + i, // id
-				"_" + i, // name
-				bodyDefnMovable.name,
-				movablePos, // pos
-				orientationDefault
-			);
+				bodyDefns.push(bodyDefn);
+			}
+		}
 
-			bodies.push(bodyMovable);
+		var worldSize = new Coords(1, 1).multiplyScalar(arenaSize);
+
+		var bodies = [];
+
+		var bodyOrientationDefault = new Coords(1, 0); // todo
+
+		for (var c = 0; c < colors.length; c++)
+		{
+			var color = colors[c];
+
+			for (var p = 0; p < pieceNamesShapesAndCounts.length; p++)
+			{
+				var pieceNameShapeAndCount = pieceNamesShapesAndCounts[p];
+				var pieceName = pieceNameShapeAndCount[0];
+				var pieceShape = pieceNameShapeAndCount[1];
+				var pieceCount = pieceNameShapeAndCount[2];
+
+				for (var pc = 0; pc < pieceCount; pc++)
+				{
+					var bodyDefn = bodyDefns.find(x => x.name == color + " " + pieceName);
+					var bd = bodyDefns.indexOf(bodyDefn);
+					var marginSize = bodyDefn.collider.size;
+					var worldSizeMinusMargins =
+						worldSize
+							.clone()
+							.subtract(marginSize)
+							.subtract(marginSize);
+
+					var bodyPos =
+						Coords.create().randomize().multiply
+						(
+							worldSizeMinusMargins
+						).add
+						(
+							marginSize
+						);
+
+					var body = new Body
+					(
+						bodyDefn.name, // id
+						"_" + bd, // name
+						bodyDefn.name,
+						bodyPos, // pos
+						bodyOrientationDefault
+					);
+
+					bodies.push(body);
+
+				}
+			}
 		}
 
 		var playerName = "Player"; // todo
 		var bodyDefnPlayer = BodyDefn.player(playerName, playerSize);
+		bodyDefns.push(bodyDefnPlayer);
+
+		/*
 		var playerScreenDimension = playerSize * 2;
 		var bodyDefnPlayerScreen = BodyDefn.playerScreen
 		(
 			playerScreenDimension
 		);
+		bodyDefns.push(bodyDefnPlayerScreen);
 
 		var playerScreenSpacingX = worldSize.x / numberOfPlayers;
 		for (var i = 0; i < numberOfPlayers; i++)
 		{
 			var playerScreenPosX = i * playerScreenSpacingX;
 			var playerScreenPos =
-				new Coords(1, 1).multiplyScalar(playerScreenDimension / 2).addXY(playerScreenPosX, 0);
+				Coords.fromXY(1, 1)
+					.multiplyScalar(playerScreenDimension / 2)
+					.addXY(playerScreenPosX, 0);
 
 			var bodyPlayerScreen = new Body
 			(
@@ -188,23 +269,20 @@ class World
 				"Player_" + i, // name
 				bodyDefnPlayerScreen.name,
 				playerScreenPos, // pos
-				orientationDefault
+				bodyOrientationDefault
 			);
 			bodies.push(bodyPlayerScreen);
 		}
-		
+		*/
+
 		var returnValue = new World
 		(
 			"World0",
-			20, // ticksPerSecond
+			20, // ticksPerSecond,
+			"Green", // colorBackground
 			worldSize,
 			actions,
-			// bodyDefns
-			[
-				bodyDefnMovable,
-				bodyDefnPlayer,
-				bodyDefnPlayerScreen
-			],
+			bodyDefns,
 			bodies
 		);
 
@@ -282,7 +360,7 @@ class World
 		for (var i = bodies.length - 1; i >= 0; i--)
 		{
 			var body = bodies[i];
-			if (body.defnName == "Movable")
+			if (body.movable(this) )
 			{
 				var movableCollider = body.defn(this).collider;
 				if (movableCollider.containsPointForPos(posToCheck, body.pos))
@@ -357,6 +435,7 @@ class World
 	drawToDisplay(display)
 	{
 		display.clear();
+		display.fillWithColor(this.colorBackground);
 
 		var bodies = this.bodies;
 		for (var i = 0; i < bodies.length; i++)

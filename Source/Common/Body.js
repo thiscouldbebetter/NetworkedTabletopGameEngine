@@ -17,19 +17,24 @@ class Body
 	{
 		var returnValue = world.bodyDefnByName(this.defnName);
 		return returnValue;
-	};
+	}
 
 	initializeForWorld(world)
 	{
 		var bodyDefn = this.defn(world);
 		this.activity = bodyDefn.activity;
-	};
+	}
+
+	movable(world)
+	{
+		return this.defn(world).movable();
+	}
 
 	overwriteWith(other)
 	{
 		this.defnName = other.defnName;
 		this.pos.overwriteWith(other.pos);
-	};
+	}
 
 	updateForTick_Actions(universe, world)
 	{

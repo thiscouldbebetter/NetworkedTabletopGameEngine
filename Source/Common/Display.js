@@ -9,7 +9,8 @@ class Display
 		this.colorBack = "White";
 		this.colorFore = "Gray";
 
-		this._drawPos = new Coords();
+		this._drawPos = Coords.create();
+		this._zeroes = Coords.zeroes();
 	}
 
 	clear()
@@ -57,30 +58,59 @@ class Display
 		g.stroke();
 	}
 
-	drawRectangle(pos, size, color)
+	drawRectangle(centerPos, size, colorFill, colorBorder)
 	{
 		var g = this.graphics;
 
 		var drawPos =
-			this._drawPos.overwriteWith(size).half().invert().add(pos);
+			this._drawPos.overwriteWith(size).half().invert().add(centerPos);
 
-		g.fillStyle = "White";
-		g.fillRect(drawPos.x, drawPos.y, size.x, size.y);
+		if (colorFill != null)
+		{
+			g.fillStyle = colorFill;
+			g.fillRect(drawPos.x, drawPos.y, size.x, size.y);
+		}
 
-		g.strokeStyle = color;
-		g.strokeRect(drawPos.x, drawPos.y, size.x, size.y);
+		if (colorBorder != null)
+		{
+			g.strokeStyle = color;
+			g.strokeRect(drawPos.x, drawPos.y, size.x, size.y);
+		}
 	}
 
-	drawText(text, drawPos)
+	drawText(text, heightInPixels, colorFill, colorBorder, drawPos)
 	{
 		var g = this.graphics;
-		g.fillStyle = this.colorFore;
+
+		g.font = "" + heightInPixels + "px";
+		var textWidth = g.measureText(text).width;
+
+		if (colorBorder != null)
+		{
+			g.fillStyle = colorBorder;
+			g.fillRect
+			(
+				drawPos.x - textWidth / 2,
+				drawPos.y - heightInPixels, 
+				textWidth,
+				heightInPixels
+			);
+		}
+
+		g.fillStyle = colorFill;
 		g.fillText
 		(
 			text, 
-			drawPos.x - g.measureText(text).width / 2,
+			drawPos.x - textWidth / 2,
 			drawPos.y
 		);
+	}
+
+	fillWithColor(color)
+	{
+		var g = this.graphics;
+		g.fillStyle = color;
+		g.fillRect(0, 0, this.size.x, this.size.y);
 	}
 
 	initialize(document)

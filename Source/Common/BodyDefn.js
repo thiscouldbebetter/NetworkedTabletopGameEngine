@@ -21,24 +21,22 @@ class BodyDefn
 		this.actionNames = actionNames;
 	}
 
-	static movable(dimension)
+	static movable(name, colorFill, colorBorder, shape)
 	{
-		var color = ColorHelper.random();
-
-		var shape = new ShapeRectangle(new Coords(1, 1).multiplyScalar(dimension));
 		var collider = shape;
-		var visualColor = color;
+		var visualColor = colorFill;
+		var heightInPixels = 10; // todo
 		var visual = new VisualGroup
 		([
-			new VisualShape(shape, visualColor),
-			new VisualText("Movable", visualColor)
+			new VisualShape(shape, visualColor, colorBorder),
+			new VisualText(name, heightInPixels, visualColor, colorBorder)
 		]);
 		
 		var returnValue = new BodyDefn
 		(
-			"Movable",
+			name,
 			[ "Movable" ], // categoryNames
-			color,
+			colorFill,
 			collider,
 			visual,
 			null, // activity 
@@ -99,10 +97,11 @@ class BodyDefn
 		var shape = new ShapeCircle(dimension);
 		var collider = shape;
 		var visualColor = color;
+		var fontHeightInPixels = 10; // todo
 		var visual = new VisualGroup
 		([
 			new VisualShape(shape, visualColor),
-			new VisualText("Player", visualColor)
+			new VisualText("Player", fontHeightInPixels, visualColor)
 		]);
 
 		var returnValue = new BodyDefn
@@ -124,12 +123,13 @@ class BodyDefn
 		var color = "Gray";
 
 		var shape = new ShapeRectangle(new Coords(1, 1).multiplyScalar(dimension));
+		var fontHeightInPixels = 10;
 		var collider = shape;
 		var visualColor = color;
 		var visual = new VisualGroup
 		([
 			new VisualShape(shape, visualColor),
-			new VisualText("PlayerScreen", visualColor)
+			new VisualText("PlayerScreen", fontHeightInPixels, visualColor)
 		]);
 
 		var returnValue = new BodyDefn
@@ -152,6 +152,13 @@ class BodyDefn
 	{
 		return (this.actionNames.indexOf(name) >= 0);
 	}
+
+	movable()
+	{
+		return (this.categoryNames.indexOf("Movable") >= 0);
+	}
+
+	// Clonable.
 
 	clone()
 	{
