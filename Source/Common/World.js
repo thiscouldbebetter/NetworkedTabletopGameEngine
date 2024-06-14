@@ -194,7 +194,84 @@ class World
 
 		var bodies = [];
 
+		var boardSquareDimension = 100;
+		var boardSquareSize = 
+			Coords.fromXY(1, 1).multiplyScalar(boardSquareDimension);
+		var boardSquareSizeHalf = boardSquareSize.half();
+		var boardSquareShape =
+			ShapeRectangle.fromSize(boardSquareSize);
+		var boardSquareVisualWhite =
+			new VisualShape(boardSquareShape, "LightGray");
+		var boardSquareVisualBlack =
+			new VisualShape(boardSquareShape, "DarkGray");
+		var boardSquareVisualsWhiteAndBlack =
+		[
+			boardSquareVisualWhite,
+			boardSquareVisualBlack
+		];
+
+		var boardSquaresAsVisuals = [];
+
+		var boardSizeInSquares = Coords.fromXY(8, 8);
+		var boardSquarePosInSquares = Coords.create();
+		var boardSquarePosInPixels = Coords.create();
+
+		for (var y = 0; y < boardSizeInSquares.y; y++)
+		{
+			boardSquarePosInSquares.y = y;
+
+			for (var x = 0; x < boardSizeInSquares.x; x++)
+			{
+				boardSquarePosInSquares.x = x;
+
+				boardSquarePosInPixels
+					.overwriteWith(boardSquarePosInSquares)
+					.multiply(boardSquareSize)
+					.add(boardSquareSizeHalf);
+
+				var squareIndex = y * boardSizeInSquares.x + x + (y % 2);
+				var boardSquareVisualWhiteOrBlack =
+					boardSquareVisualsWhiteAndBlack[squareIndex % 2]; // todo
+
+				var visualForSquare = new VisualOffset
+				(
+					boardSquarePosInPixels.clone(),
+					boardSquareVisualWhiteOrBlack
+				);
+
+				boardSquaresAsVisuals.push(visualForSquare);
+			}
+		}
+
+		var boardVisual = new VisualGroup(boardSquaresAsVisuals);
+
+		var bodyDefnBoard = new BodyDefn
+		(
+			"Board", // name, 
+			null, // categoryNames,
+			"Cyan", // color, 
+			null, // collider,
+			boardVisual,
+			null, // activity,
+			null // actionNames
+		);
+
+		bodyDefns.push(bodyDefnBoard);
+
 		var bodyOrientationDefault = new Coords(1, 0); // todo
+
+		var bodyBoardPos = Coords.zeroes(); // todo
+
+		var bodyBoard = new Body
+		(
+			bodyDefnBoard.name, // id
+			"_Board", // name
+			bodyDefnBoard.name, // defn
+			bodyBoardPos, // pos
+			bodyOrientationDefault
+		);
+
+		bodies.push(bodyBoard);
 
 		for (var c = 0; c < colors.length; c++)
 		{

@@ -1,10 +1,12 @@
 
-function VisualGroup(children)
+class VisualGroup
 {
-	this.children = children;
-}
-{
-	VisualGroup.prototype.draw = function(display, pos)
+	constructor(children)
+	{
+		this.children = children;
+	}
+
+	draw(display, pos)
 	{
 		for (var i = 0; i < this.children.length; i++)
 		{

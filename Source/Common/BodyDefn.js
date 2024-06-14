@@ -13,12 +13,12 @@ class BodyDefn
 	)
 	{
 		this.name = name;
-		this.categoryNames = categoryNames;
-		this.color = color;
+		this.categoryNames = categoryNames || [];
+		this.color = color || "Gray";
 		this.collider = collider;
 		this.visual = visual;
 		this.activity = activity;
-		this.actionNames = actionNames;
+		this.actionNames = actionNames || [];
 	}
 
 	static movable(name, colorFill, colorBorder, shape)
