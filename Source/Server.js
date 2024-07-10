@@ -18,8 +18,8 @@ function ClientConnection(server, clientID, socket)
 		this.handleEvent_ClientIdentifyingSelf.bind(this)
 	);
 }
-{	
-	ClientConnection.prototype.handleEvent_ClientDisconnected = function()
+{
+	handleEvent_ClientDisconnected()
 	{
 		console.log("Someone left the server.")
 		var bodies = this.server.world.bodies;
@@ -29,20 +29,20 @@ function ClientConnection(server, clientID, socket)
 			bodyToDestroy.isDisconnected = true;
 		}
 	}
-	
-	ClientConnection.prototype.handleEvent_ClientIdentifyingSelf = function(clientName)
+
+	handleEvent_ClientIdentifyingSelf(clientName)
 	{
 		this.clientName = clientName;
-		
+
 		var server = this.server;
 
 		var clientConnection = server.clientConnections[this.clientID];
 		var socketToClient = clientConnection.socket;
-		
+
 		var session = new Session(this.clientID, server.world);
 		var sessionSerialized = server.serializer.serialize(session);
 		socketToClient.emit("sessionEstablished", sessionSerialized);
-	
+
 		var world = server.world;
 		var bodyDefnPlayer = world.bodyDefns["Player"];
 		var bodyDefnForClient = bodyDefnPlayer.clone();
@@ -68,7 +68,7 @@ function ClientConnection(server, clientID, socket)
 		var updateBodyCreate = new Update_BodyCreate(bodyForClient);
 		world.updatesOutgoing.push(updateBodyCreate);
 		updateBodyCreate.updateWorld(world);
-		
+
 		socketToClient.on
 		(
 			"update",
@@ -80,11 +80,11 @@ function ClientConnection(server, clientID, socket)
 			"disconnect",
 			this.handleEvent_ClientDisconnected.bind(this)
 		);
-		
+
 		console.log(clientName + " joined the server.");
 	}
-	
-	ClientConnection.prototype.handleEvent_ClientUpdateReceived = function(updateSerialized)
+
+	handleEvent_ClientUpdateReceived(updateSerialized)
 	{
 		var serializer;
 		var firstChar = updateSerialized[0];
@@ -101,23 +101,25 @@ function ClientConnection(server, clientID, socket)
 				serializer = new Update_Actions();
 			}
 		}
-		
+
 		var update = serializer.deserialize
 		(
 			updateSerialized
 		);
-				
+
 		update.updateWorld(this.server.world);
 	}	
 }
 
-function Server(portToListenOn, world)
+class Server
 {
-	this.portToListenOn = portToListenOn;
-	this.world = world;
-}
-{
-	Server.prototype.initialize = function()
+	constructor(portToListenOn, world)
+	{
+		this.portToListenOn = portToListenOn;
+		this.world = world;
+	}
+
+	initialize()
 	{
 		this.clientConnections = [];
 		
@@ -149,10 +151,10 @@ function Server(portToListenOn, world)
 		(
 			this.updateForTick.bind(this),
 			this.world.millisecondsPerTick()
-		);	
+		);
 	}
 
-	Server.prototype.updateForTick = function()
+	updateForTick()
 	{
 		var world = this.world;
 
@@ -169,7 +171,7 @@ function Server(portToListenOn, world)
 		this.updateForTick_UpdatesOutgoingSend();
 	}
 
-	Server.prototype.updateForTick_Server = function()
+	updateForTick_Server()
 	{
 		var world = this.world;
 		var bodies = world.bodies;
@@ -182,7 +184,7 @@ function Server(portToListenOn, world)
 		}
 	}
 
-	Server.prototype.updateForTick_UpdatesOutgoingSend = function()
+	updateForTick_UpdatesOutgoingSend()
 	{
 		var world = this.world;
 
@@ -204,22 +206,24 @@ function Server(portToListenOn, world)
 
 	// events
 
-	Server.prototype.handleEvent_ClientConnecting = function(socketToClient)
+	handleEvent_ClientConnecting(socketToClient)
 	{
 		var clientIndex = this.clientConnections.length;
 		var clientID = "C_" + clientIndex;
-		
+
 		var clientConnection = new ClientConnection(this, clientID, socketToClient);
 		this.clientConnections.push(clientConnection);
 		this.clientConnections[clientID] = clientConnection;
-	
+
 		socketToClient.emit("connected", clientID);
-	}		
+	}
 }
 
 function main()
-{	
+{
 	var args = process.argv;
+
+	var argsByName = new Map();
 
 	for (var a = 2; a < args.length; a++)
 	{
@@ -229,37 +233,34 @@ function main()
 
 		var argName = argParts[0];
 		var argValue = argParts[1];
-			
-		args[argName] = argValue;
+
+		argsByName.set(argName, argValue);
 	}
 
-	var argNameToDefaultLookup = 
+	var argDefaultsByName = new Map
+	([
+		[ "--port", "8089" ],
+		[ "-a", "128" ],
+		[ "-p", "10" ],
+		[ "-s", "3" ],
+		[ "-b", "1" ]
+	]);
+
+	for (var argName in argDefaultsByName.keys)
 	{
-		"--port" : "8089",
-		"-a" : "128",
-		"-p" : "10",
-		"-s" : "3",
-		"-b" : "1"
-	};
-		
-	for (var argName in argNameToDefaultLookup)
-	{
-		if (args[argName] == null)
+		if (argsByName.has(argName) == false)
 		{
-			var argValueDefault = argNameToDefaultLookup[argName];
-			args[argName] = argValueDefault;
+			var argValueDefault = argDefaultsByName.get(argName);
+			argsByName.set(argName, argValueDefault);
 		}
 	}
-	
+
 	var servicePort = parseInt(args["--port"]);
 	var arenaSize = parseInt(args["-a"]);
-	var planetSize = parseInt(args["-p"]);
-	var shipSize = parseInt(args["-s"]);
-	var bulletSize = parseInt(args["-b"]);
-	
+
 	var world = World.build
 	(
-		arenaSize, planetSize, shipSize, bulletSize
+		arenaSize
 	);
 
 	new Server(servicePort, world).initialize();

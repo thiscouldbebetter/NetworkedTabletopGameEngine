@@ -19,6 +19,7 @@
 <script type="text/javascript" src="Common/ShapeCircle.js"></script>
 <script type="text/javascript" src="Common/ShapeRectangle.js"></script>
 <script type="text/javascript" src="Common/Update_Actions.js"></script>
+<script type="text/javascript" src="Common/Update_BodiesReset.js"></script>
 <script type="text/javascript" src="Common/Update_BodyCreate.js"></script>
 <script type="text/javascript" src="Common/Update_BodyDefnRegister.js"></script>
 <script type="text/javascript" src="Common/Update_BodyRemove.js"></script>
@@ -44,26 +45,13 @@
 
 <script type="text/javascript">
 
-function Local()
+class Local
 {
-	// do nothing
-}
-{
-	Local.prototype.initialize = function()
+	initialize()
 	{
 		this.clientID = "_" + IDHelper.IDNext();
 
 		this.updatesIncoming = [];
-
-		/*
-		var bodyDefnForUser = BodyDefn.player
-		(
-			this.world,
-			15 // radius
-		);
-		var update = new Update_BodyDefnRegister(bodyDefnForUser);
-		this.world.updatesOutgoing.push(update);
-		*/
 
 		var bodyDefnPlayer = this.world.bodyDefnByName("Player");
 
@@ -75,8 +63,8 @@ function Local()
 			new Coords(1, 1).multiplyScalar(bodyDefnPlayer.collider.radius),
 			new Coords(1, 0)
 		);
-		
-		update = new Update_BodyCreate(bodyForUser);
+
+		var update = new Update_BodyCreate(bodyForUser);
 		this.world.updatesOutgoing.push(update);
 
 		setInterval
@@ -90,9 +78,9 @@ function Local()
 
 		this.inputHelper = new InputHelper();
 		this.inputHelper.initialize(document, this.display);
-	};
+	}
 
-	Local.prototype.start = function()
+	start()
 	{
 		this.clientID = IDHelper.IDNext();
 		this.document = document;
@@ -100,9 +88,9 @@ function Local()
 		this.world = World.default();
 
 		this.initialize();
-	};
+	}
 
-	Local.prototype.updateForTick = function()
+	updateForTick()
 	{
 		var world = this.world;
 
@@ -117,13 +105,13 @@ function Local()
 		this.updateForTick_Server();
 
 		this.updateForTick_UpdatesOutgoingSend();
-	};
+	}
 
-	Local.prototype.updateForTick_Client = function()
+	updateForTick_Client()
 	{
 		var world = this.world;
 
-		var bodyForUser = world.bodies[this.clientID];
+		var bodyForUser = world.bodyById(this.clientID);
 
 		if (bodyForUser != null)
 		{
@@ -135,9 +123,9 @@ function Local()
 		}
 
 		this.world.drawToDisplay(this.display);
-	};
+	}
 
-	Local.prototype.updateForTick_Server = function()
+	updateForTick_Server()
 	{
 		var world = this.world;
 		var bodies = world.bodies;
@@ -148,9 +136,9 @@ function Local()
 			body.updateForTick_Connectivity(world);
 			body.updateForTick_Actions(this, world);
 		}
-	};
+	}
 
-	Local.prototype.updateForTick_UpdatesOutgoingSend = function()
+	updateForTick_UpdatesOutgoingSend()
 	{
 		var world = this.world;
 
@@ -161,7 +149,7 @@ function Local()
 			this.updatesIncoming.push(update);
 		}
 		world.updatesOutgoing.length = 0;
-	};
+	}
 }
 
 new Local().start();
