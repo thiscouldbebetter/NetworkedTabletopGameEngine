@@ -36,6 +36,47 @@ class Display
 		g.stroke();
 	}
 
+	drawPolygonWithVerticesAtPos
+	(
+		vertices, pos, colorFill, colorBorder
+	)
+	{
+		var g = this.graphics;
+
+		g.beginPath();
+		for (var i = 0; i < vertices.length; i++)
+		{
+			var vertex = vertices[i];
+			var drawPos =
+				this._drawPos
+					.overwriteWith(vertex)
+					.add(pos);
+
+			if (i == 0)
+			{
+				g.moveTo(drawPos.x, drawPos.y);
+			}
+			else
+			{
+				g.lineTo(drawPos.x, drawPos.y);
+			}
+		}
+
+		g.closePath();
+
+		if (colorFill != null)
+		{
+			g.fillStyle = colorFill;
+			g.fill();
+		}
+
+		if (colorBorder != null)
+		{
+			g.strokeStyle = colorBorder;
+			g.stroke();
+		}
+	}
+
 	drawRay(vertex, orientation, length, color)
 	{
 		var g = this.graphics;
@@ -73,7 +114,7 @@ class Display
 
 		if (colorBorder != null)
 		{
-			g.strokeStyle = color;
+			g.strokeStyle = colorBorder;
 			g.strokeRect(drawPos.x, drawPos.y, size.x, size.y);
 		}
 	}

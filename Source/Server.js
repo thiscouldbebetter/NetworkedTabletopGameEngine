@@ -258,7 +258,7 @@ function main()
 	var servicePort = parseInt(args["--port"]);
 	var arenaSize = parseInt(args["-a"]);
 
-	var world = World.build
+	var world = World.chess
 	(
 		arenaSize
 	);

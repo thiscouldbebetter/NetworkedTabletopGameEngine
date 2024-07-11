@@ -34,25 +34,25 @@ class World
 
 	// static methods
 
-	static build
+	static chess
 	(
 		arenaSize, movableDimension, playerSize, numberOfPlayers
 	)
 	{
-		var actions = this.build_Actions();
+		var actions = this.chess_Actions();
 
-		var colors = this.build_Colors();
+		var colors = this.chess_Colors();
 
 		var pieceNamesShapesAndCounts =
-			this.build_PieceNamesShapesAndCounts();
+			this.chess_PieceNamesShapesAndCounts();
 
 		var bodyDefns =
-			this.build_BodyDefns(colors, pieceNamesShapesAndCounts);
+			this.chess_BodyDefns(colors, pieceNamesShapesAndCounts);
 
 		var worldSize =
 			new Coords(1, 1).multiplyScalar(arenaSize);
 
-		var bodies = this.build_Bodies
+		var bodies = this.chess_Bodies
 		(
 			bodyDefns, colors, pieceNamesShapesAndCounts, worldSize
 		);
@@ -75,7 +75,7 @@ class World
 		return returnValue;
 	};
 
-	static build_Actions()
+	static chess_Actions()
 	{
 		var actions = 
 		[
@@ -157,7 +157,7 @@ class World
 		return actions;
 	}
 
-	static build_Bodies
+	static chess_Bodies
 	(
 		bodyDefns, colors, pieceNamesShapesAndCounts, worldSize
 	)
@@ -196,7 +196,7 @@ class World
 				{
 					var bodyDefn = bodyDefns.find(x => x.name == color + " " + pieceName);
 					var bd = bodyDefns.indexOf(bodyDefn);
-					var marginSize = bodyDefn.collider.size;
+					var marginSize = bodyDefn.collider.boundingRectangle().size;
 					var worldSizeMinusMargins =
 						worldSize
 							.clone()
@@ -230,7 +230,7 @@ class World
 		return bodies;
 	}
 
-	static build_BodyDefnBoard()
+	static chess_BodyDefnBoard()
 	{
 		var boardSquareDimension = 100;
 		var boardSquareSize = 
@@ -239,9 +239,9 @@ class World
 		var boardSquareShape =
 			ShapeRectangle.fromSize(boardSquareSize);
 		var boardSquareVisualWhite =
-			new VisualShape(boardSquareShape, "LightGray");
+			new VisualShape(boardSquareShape, "LightGray", null);
 		var boardSquareVisualBlack =
-			new VisualShape(boardSquareShape, "DarkGray");
+			new VisualShape(boardSquareShape, "DarkGray", null);
 		var boardSquareVisualsWhiteAndBlack =
 		[
 			boardSquareVisualWhite,
@@ -297,7 +297,7 @@ class World
 		return bodyDefnBoard;
 	}
 
-	static build_BodyDefns(colors, pieceNamesShapesAndCounts)
+	static chess_BodyDefns(colors, pieceNamesShapesAndCounts)
 	{
 		var bodyDefns = [];
 
@@ -324,13 +324,13 @@ class World
 			}
 		}
 
-		var bodyDefnBoard = this.build_BodyDefnBoard();
+		var bodyDefnBoard = this.chess_BodyDefnBoard();
 		bodyDefns.push(bodyDefnBoard);
 
 		return bodyDefns;
 	}
 
-	static build_Colors()
+	static chess_Colors()
 	{
 		var colorWhite = "White";
 		var colorBlack = "Black";
@@ -339,24 +339,148 @@ class World
 		return colors;
 	}
 
-	static build_PieceNamesShapesAndCounts()
+	static chess_PieceNamesShapesAndCounts()
 	{
 		var scaleFactor = 20;
-		var rectangleMedium =
-			ShapeRectangle.fromSize(Coords.fromXY(1, 2).multiplyScalar(scaleFactor) );
-		var rectangleShort =
-			ShapeRectangle.fromSize(Coords.fromXY(1, 1).multiplyScalar(scaleFactor) );
-		var rectangleTall =
-			ShapeRectangle.fromSize(Coords.fromXY(1, 3).multiplyScalar(scaleFactor) );
+
+		var shapeBishop = new ShapeGroup
+		([
+			new ShapePolygon
+			([
+				new Coords(0, -1),
+				new Coords(0.5, 1),
+				new Coords(-0.5, 1)
+			]),
+
+			new ShapePolygon
+			([
+				new Coords(0.5, 0),
+				new Coords(0, 0.5),
+				new Coords(-0.5, 0),
+				new Coords(0, -1)
+			]).transformTranslate(new Coords(0, -.5) )
+		]).transformScale(scaleFactor);
+
+		var shapeKing = new ShapeGroup
+		([
+			new ShapePolygon
+			([
+				new Coords(0, -1),
+				new Coords(0.5, 1),
+				new Coords(-0.5, 1)
+			]),
+
+			new ShapePolygon
+			([
+				new Coords(0.5, 1),
+				new Coords(0.5, 0.5),
+				new Coords(1, 0.5),
+				new Coords(1, -0.5),
+				new Coords(0.5, -0.5),
+				new Coords(0.5, -1),
+				new Coords(-0.5, -1),
+				new Coords(-0.5, -0.5),
+				new Coords(-1, -0.5),
+				new Coords(-1, 0.5),
+				new Coords(-0.5, 0.5),
+				new Coords(-0.5, 1),
+			]).transformScale(.5).transformTranslate
+			(
+				new Coords(0, -.6)
+			)
+		]).transformScale(scaleFactor);
+
+		var shapeKnight = new ShapeGroup
+		([
+			new ShapePolygon
+			([
+				new Coords(0, -1),
+				new Coords(0.5, 1),
+				new Coords(-0.5, 1)
+			]),
+
+			new ShapePolygon
+			([
+				new Coords(1, 0),
+				new Coords(0, 0.5),
+				new Coords(-0.5, 0),
+				new Coords(0, -0.5)
+			]).transformTranslate(new Coords(0, -.4) )
+		]).transformScale(scaleFactor);
+
+		var shapePawn = new ShapeGroup
+		([
+			new ShapePolygon
+			([
+				new Coords(0, -.5),
+				new Coords(0.5, 1),
+				new Coords(-0.5, 1)
+			]),
+
+			new ShapePolygon
+			([
+				new Coords(0.5, 0),
+				new Coords(0.3, 0.3),
+				new Coords(0, 0.5),
+				new Coords(-0.3, 0.3),
+				new Coords(-0.5, 0),
+				new Coords(-0.3, -0.3),
+				new Coords(0, -0.5),
+				new Coords(0.3, -0.3)
+			]).transformTranslate(new Coords(0, -.2) )
+		]).transformScale(scaleFactor);
+
+		var shapeQueen = new ShapeGroup
+		([
+			new ShapePolygon
+			([
+				new Coords(0, -1),
+				new Coords(0.5, 1),
+				new Coords(-0.5, 1)
+			]),
+
+			new ShapePolygon
+			([
+				new Coords(.5, 1),
+				new Coords(-.5, 1),
+				new Coords(-1, -1),
+				new Coords(0, 0),
+				new Coords(1, -1)
+			]).transformScale(.5).transformTranslate
+			(
+				new Coords(0, -.8)
+			)
+		]).transformScale(scaleFactor);
+
+		var shapeRook = new ShapeGroup
+		([
+			new ShapePolygon
+			([
+				new Coords(0, -1),
+				new Coords(0.5, 1),
+				new Coords(-0.5, 1)
+			]),
+
+			new ShapePolygon
+			([
+				new Coords(1, .8),
+				new Coords(-1, .8),
+				new Coords(-1, -.8),
+				new Coords(1, -.8)
+			]).transformScale(.5).transformTranslate
+			(
+				new Coords(0, -.8)
+			)
+		]).transformScale(scaleFactor);
 
 		var pieceNamesShapesAndCounts =
 		[
-			[ "Bishop", rectangleMedium, 2 ],
-			[ "King", rectangleTall, 1 ],
-			[ "Knight", rectangleMedium, 2 ],
-			[ "Pawn", rectangleShort, 8 ],
-			[ "Queen", rectangleTall, 1 ],
-			[ "Rook", rectangleMedium, 2 ],
+			[ "Bishop", shapeBishop, 2 ],
+			[ "King", shapeKing, 1 ],
+			[ "Knight", shapeKnight, 2 ],
+			[ "Pawn", shapePawn, 8 ],
+			[ "Queen", shapeQueen, 1 ],
+			[ "Rook", shapeRook, 2 ],
 		];
 
 		return pieceNamesShapesAndCounts;
@@ -364,7 +488,7 @@ class World
 
 	static default()
 	{
-		return World.build
+		return World.chess
 		(
 			512, // arenaSize
 			40,	// movableSize

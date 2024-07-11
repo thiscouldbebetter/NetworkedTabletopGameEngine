@@ -29,7 +29,7 @@ class BodyDefn
 		var visual = new VisualGroup
 		([
 			new VisualShape(shape, visualColor, colorBorder),
-			new VisualText(name, heightInPixels, visualColor, colorBorder)
+			//new VisualText(name, heightInPixels, visualColor, colorBorder)
 		]);
 		
 		var returnValue = new BodyDefn
@@ -96,12 +96,13 @@ class BodyDefn
 
 		var shape = new ShapeCircle(dimension);
 		var collider = shape;
-		var visualColor = color;
+		var visualColorBorder = color;
 		var fontHeightInPixels = 10; // todo
+		var visualColorFill = "White";
 		var visual = new VisualGroup
 		([
-			new VisualShape(shape, visualColor),
-			new VisualText("Player", fontHeightInPixels, visualColor)
+			new VisualShape(shape, visualColorFill, visualColorBorder),
+			new VisualText("Player", fontHeightInPixels, visualColorBorder)
 		]);
 
 		var returnValue = new BodyDefn
