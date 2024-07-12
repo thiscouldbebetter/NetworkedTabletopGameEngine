@@ -36,7 +36,10 @@ class World
 
 	static chess
 	(
-		arenaSize, movableDimension, playerSize, numberOfPlayers
+		arenaSize,
+		movableDimension,
+		playerSize,
+		numberOfPlayers
 	)
 	{
 		var actions = this.chess_Actions();
@@ -54,7 +57,10 @@ class World
 
 		var bodies = this.chess_Bodies
 		(
-			bodyDefns, colors, pieceNamesShapesAndCounts, worldSize
+			bodyDefns,
+			colors,
+			pieceNamesShapesAndCounts,
+			worldSize
 		);
 
 		var playerName = "Player"; // todo
@@ -159,7 +165,10 @@ class World
 
 	static chess_Bodies
 	(
-		bodyDefns, colors, pieceNamesShapesAndCounts, worldSize
+		bodyDefns,
+		colors,
+		pieceNamesShapesAndCounts,
+		worldSize
 	)
 	{
 		var bodies = [];
@@ -181,51 +190,63 @@ class World
 
 		bodies.push(bodyBoard);
 
-		for (var c = 0; c < colors.length; c++)
-		{
-			var color = colors[c];
+		var bodyPosInCells = new Coords();
+		var boardSizeInCells = new Coords(8, 8);
+		var cellSizeInPixels = new Coords(1, 1).multiplyScalar(50);
 
-			for (var p = 0; p < pieceNamesShapesAndCounts.length; p++)
-			{
-				var pieceNameShapeAndCount = pieceNamesShapesAndCounts[p];
-				var pieceName = pieceNameShapeAndCount[0];
-				var pieceShape = pieceNameShapeAndCount[1];
-				var pieceCount = pieceNameShapeAndCount[2];
+		var body = (defnName, index, posInCells) =>
+			new Body
+			(
+				defnName,
+				defnName + index,
+				defnName,
+				posInCells
+					.clone()
+					.add(Coords.ones() ) 
+					.multiply(cellSizeInPixels),
+				bodyOrientationDefault
+			);
 
-				for (var pc = 0; pc < pieceCount; pc++)
-				{
-					var bodyDefn = bodyDefns.find(x => x.name == color + " " + pieceName);
-					var bd = bodyDefns.indexOf(bodyDefn);
-					var marginSize = bodyDefn.collider.boundingRectangle().size;
-					var worldSizeMinusMargins =
-						worldSize
-							.clone()
-							.subtract(marginSize)
-							.subtract(marginSize);
+		var bodiesPieces =
+		[
+			body("Black Rook", 		"0", new Coords(0, 0) ),
+			body("Black Knight", 	"0", new Coords(1, 0) ),
+			body("Black Bishop", 	"0", new Coords(2, 0) ),
+			body("Black Queen", 	"", new Coords(3, 0) ),
+			body("Black King", 		"", new Coords(4, 0) ),
+			body("Black Bishop", 	"1", new Coords(5, 0) ),
+			body("Black Knight", 	"1", new Coords(6, 0) ),
+			body("Black Rook", 		"1", new Coords(7, 0) ),
 
-					var bodyPos =
-						Coords.create().randomize().multiply
-						(
-							worldSizeMinusMargins
-						).add
-						(
-							marginSize
-						);
+			body("Black Pawn", 		"0", new Coords(0, 1) ),
+			body("Black Pawn", 		"1", new Coords(1, 1) ),
+			body("Black Pawn", 		"2", new Coords(2, 1) ),
+			body("Black Pawn", 		"3", new Coords(3, 1) ),
+			body("Black Pawn", 		"4", new Coords(4, 1) ),
+			body("Black Pawn", 		"5", new Coords(5, 1) ),
+			body("Black Pawn", 		"6", new Coords(6, 1) ),
+			body("Black Pawn", 		"7", new Coords(7, 1) ),
 
-					var body = new Body
-					(
-						bodyDefn.name, // id
-						"_" + bd, // name
-						bodyDefn.name,
-						bodyPos, // pos
-						bodyOrientationDefault
-					);
+			body("White Pawn", 		"0", new Coords(0, 6) ),
+			body("White Pawn", 		"1", new Coords(1, 6) ),
+			body("White Pawn", 		"2", new Coords(2, 6) ),
+			body("White Pawn", 		"3", new Coords(3, 6) ),
+			body("White Pawn", 		"4", new Coords(4, 6) ),
+			body("White Pawn", 		"5", new Coords(5, 6) ),
+			body("White Pawn", 		"6", new Coords(6, 6) ),
+			body("White Pawn", 		"7", new Coords(7, 6) ),
 
-					bodies.push(body);
+			body("White Rook", 		"0", new Coords(0, 7) ),
+			body("White Knight", 	"0", new Coords(1, 7) ),
+			body("White Bishop", 	"0", new Coords(2, 7) ),
+			body("White Queen", 	"", new Coords(3, 7) ),
+			body("White King", 		"", new Coords(4, 7) ),
+			body("White Bishop", 	"1", new Coords(5, 7) ),
+			body("White Knight", 	"1", new Coords(6, 7) ),
+			body("White Rook", 		"1", new Coords(7, 7) )
+		];
 
-				}
-			}
-		}
+		bodies.push(...bodiesPieces);
 
 		return bodies;
 	}
