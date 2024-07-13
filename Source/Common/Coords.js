@@ -26,6 +26,11 @@ class Coords
 		return new Coords(1, 1);
 	}
 
+	static random()
+	{
+		return new Coords(Math.random(), Math.random() );
+	}
+
 	static zeroes()
 	{
 		return new Coords(0, 0);
