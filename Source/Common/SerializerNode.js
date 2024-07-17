@@ -16,7 +16,7 @@ class SerializerNode
 	)
 	{
 		if (this.objectWrapped != null)
-		{			
+		{
 			var typeName = this.objectWrapped.constructor.name;
 
 			var objectIndexExisting = 
@@ -38,7 +38,7 @@ class SerializerNode
 				objectIndexToNodeLookup[objectIndex] = this;
 
 				this.objectWrappedTypeName = typeName;
-	
+
 				if (typeName == "Function")
 				{
 					this.objectWrapped = this.objectWrapped.toString();
@@ -46,7 +46,7 @@ class SerializerNode
 				else
 				{
 					this.children = {};
-	
+
 					for (var propertyName in this.objectWrapped)
 					{
 						if (this.objectWrapped.__proto__[propertyName] == null)

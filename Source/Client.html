@@ -3,14 +3,12 @@
 
 <!-- imports -->
 
-<script type="text/javascript" src="Common/ArrayExtensions.js"></script>
 <script type="text/javascript" src="Common/Action.js"></script>
 <script type="text/javascript" src="Common/Activity.js"></script>
 <script type="text/javascript" src="Common/Body.js"></script>
 <script type="text/javascript" src="Common/BodyDefn.js"></script>
 <script type="text/javascript" src="Common/ColorHelper.js"></script>
 <script type="text/javascript" src="Common/Coords.js"></script>
-<script type="text/javascript" src="Common/Device.js"></script>
 <script type="text/javascript" src="Common/Log.js"></script>
 <script type="text/javascript" src="Common/Display.js"></script>
 <script type="text/javascript" src="Common/IDHelper.js"></script>
@@ -18,18 +16,36 @@
 <script type="text/javascript" src="Common/Serializer.js"></script>
 <script type="text/javascript" src="Common/SerializerNode.js"></script>
 <script type="text/javascript" src="Common/Session.js"></script>
+<script type="text/javascript" src="Common/ShapeCircle.js"></script>
+<script type="text/javascript" src="Common/ShapeGroup.js"></script>
+<script type="text/javascript" src="Common/ShapePolygon.js"></script>
+<script type="text/javascript" src="Common/ShapeRectangle.js"></script>
 <script type="text/javascript" src="Common/Update_Actions.js"></script>
+<script type="text/javascript" src="Common/Update_BodiesReset.js"></script>
 <script type="text/javascript" src="Common/Update_BodyCreate.js"></script>
 <script type="text/javascript" src="Common/Update_BodyDefnRegister.js"></script>
 <script type="text/javascript" src="Common/Update_BodyRemove.js"></script>
-<script type="text/javascript" src="Common/Update_Physics.js"></script>
+<script type="text/javascript" src="Common/VisualGroup.js"></script>
+<script type="text/javascript" src="Common/VisualOffset.js"></script>
+<script type="text/javascript" src="Common/VisualShape.js"></script>
+<script type="text/javascript" src="Common/VisualText.js"></script>
 <script type="text/javascript" src="Common/World.js"></script>
 
-<script type="text/javascript" src="node_modules/socket.io-client/dist/socket.io.js"></script>
+<script type="text/javascript" src="Common/Games/Cards.js"></script>
+<script type="text/javascript" src="Common/Games/Chess.js"></script>
+
+<script type="text/javascript" src="node_modules/socket.io/client-dist/socket.io.js"></script>
 
 <!-- imports ends -->
 
 <div id="divUI">
+
+	<h3>Networked Tabletop Game Engine</h3>
+
+	<p>
+		Make sure the server is started, then
+		enter a name and click the Connect button.
+	</p>
 
 	<label>Server:</label>
 	<input id="inputServiceURL" value="http://localhost:8089"></input>
@@ -96,14 +112,17 @@ function Client()
 			this.socketToServer.disconnect();
 			this.socketToServer = null;
 		}
-		
-		this.socketToServer = io.connect(this.serviceURL);
-		
+
+		this.socketToServer = io.connect
+		(
+			this.serviceURL //, { transports : ['websocket'] }
+		);
+
 		this.socketToServer.on
 		(
 			"connected", 
 			this.handleEvent_ServerConnected.bind(this)
-		);	
+		);
 	}
 	
 	Client.prototype.updateForTick = function()

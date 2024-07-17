@@ -3,6 +3,11 @@ Networked Tabletop Game Engine
 
 An engine for networked tabletop gaming, using Node.js and its library "socket.io".
 
+<img src="Screenshot.png" />
+
+Running
+-------
+
 To run the server:
 
 1. Make sure Node.js is installed.

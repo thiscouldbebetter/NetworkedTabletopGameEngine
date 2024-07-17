@@ -47,7 +47,7 @@ class World
 			);
 
 		return returnValue;
-	};
+	}
 
 	// instance methods
 
@@ -82,7 +82,7 @@ class World
 				this.bodiesById.delete(body.id);
 			}
 		}
-	};
+	}
 
 	bodySpawn(body, spawnUnder)
 	{
@@ -96,12 +96,12 @@ class World
 		}
 		this.bodiesById.set(body.id, body);
 		body.initializeForWorld(this);
-	};
+	}
 
 	millisecondsPerTick()
 	{
 		return Math.floor(1000 / this.ticksPerSecond);
-	};
+	}
 
 	movablesAtPosAddToList(posToCheck, movablesAtPos)
 	{
